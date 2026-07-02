@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import Badge from "@/components/ui/Badge";
-import { creerResidenceType, creerResidence, changerStatutResidence } from "./actions";
+import {
+  creerResidenceType,
+  creerResidence,
+  changerStatutResidence,
+  modifierMediasResidenceType,
+} from "./actions";
 
 const PAYS = [
   { code: "BJ", nom: "Bénin" },
@@ -114,13 +119,49 @@ export default async function AdminResidencesPage() {
 
       <div>
         <h2 className="text-lg font-semibold text-neutral-900">Types de résidence</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="mt-4 space-y-4">
           {types.map((type) => (
             <div key={type.id} className="rounded-lg border border-neutral-200 p-4">
               <p className="font-medium text-neutral-900">{type.nom}</p>
               <p className="text-sm text-neutral-500">
                 {type.standing} · {type.nbStudios} studios · {type.superficie} m²
               </p>
+              <p className="mt-1 text-xs text-neutral-400">
+                {type.photos.length} photo(s) · visite 3D {type.matterportUrl ? "configurée" : "absente"}
+              </p>
+
+              <form
+                action={modifierMediasResidenceType.bind(null, type.id)}
+                className="mt-3 grid gap-3 sm:grid-cols-2"
+              >
+                <input
+                  type="url"
+                  name="matterportUrl"
+                  placeholder="URL Matterport"
+                  defaultValue={type.matterportUrl ?? ""}
+                  className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+                />
+                <input
+                  type="url"
+                  name="planUrl"
+                  placeholder="URL du plan"
+                  defaultValue={type.planUrl ?? ""}
+                  className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+                />
+                <input
+                  type="text"
+                  name="photos"
+                  placeholder="URLs des photos (séparées par des virgules)"
+                  defaultValue={type.photos.join(", ")}
+                  className="sm:col-span-2 rounded-md border border-neutral-300 px-3 py-2 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="sm:col-span-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-900"
+                >
+                  Mettre à jour les médias
+                </button>
+              </form>
             </div>
           ))}
         </div>

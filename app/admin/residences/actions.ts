@@ -52,6 +52,31 @@ export async function creerResidenceType(formData: FormData) {
   revalidatePath("/admin/residences");
 }
 
+const residenceTypeMediaSchema = z.object({
+  matterportUrl: z.string().optional(),
+  photos: z.string().optional(),
+  planUrl: z.string().optional(),
+});
+
+export async function modifierMediasResidenceType(typeId: string, formData: FormData) {
+  const data = residenceTypeMediaSchema.parse({
+    matterportUrl: formData.get("matterportUrl"),
+    photos: formData.get("photos"),
+    planUrl: formData.get("planUrl"),
+  });
+
+  await prisma.residenceType.update({
+    where: { id: typeId },
+    data: {
+      matterportUrl: data.matterportUrl || null,
+      photos: data.photos ? data.photos.split(",").map((s) => s.trim()).filter(Boolean) : [],
+      planUrl: data.planUrl || null,
+    },
+  });
+
+  revalidatePath("/admin/residences");
+}
+
 const residenceSchema = z.object({
   nom: z.string().min(1),
   paysCode: z.enum(["BJ", "TG", "BF", "CI", "AE"]),
