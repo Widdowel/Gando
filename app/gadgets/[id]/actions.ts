@@ -11,28 +11,32 @@ export async function acheterGadget(gadgetId: string) {
   const session = await auth();
   if (!session) redirect("/login");
 
-  await prisma.$transaction(async (tx) => {
-    const gadget = await tx.gadget.findUnique({ where: { id: gadgetId } });
-    if (!gadget) throw new Error("Gadget introuvable");
-    if (gadget.stockVendu >= gadget.stockTotal) {
-      throw new Error("Ce gadget n'est plus en stock");
-    }
+  try {
+    await prisma.$transaction(async (tx) => {
+      const gadget = await tx.gadget.findUnique({ where: { id: gadgetId } });
+      if (!gadget || gadget.stockVendu >= gadget.stockTotal) {
+        throw new Error("rupture");
+      }
 
-    await tx.achatGadget.create({
-      data: {
-        userId: session.user.id,
-        gadgetId,
-        montantPaye: gadget.prix,
-        recompenseCible: gadget.recompenseCible,
-      },
-    });
+      await tx.achatGadget.create({
+        data: {
+          userId: session.user.id,
+          gadgetId,
+          montantPaye: gadget.prix,
+          recompenseCible: gadget.recompenseCible,
+        },
+      });
 
-    await tx.gadget.update({
-      where: { id: gadgetId },
-      data: { stockVendu: { increment: 1 } },
+      await tx.gadget.update({
+        where: { id: gadgetId },
+        data: { stockVendu: { increment: 1 } },
+      });
     });
-  });
+  } catch {
+    redirect(`/gadgets/${gadgetId}?error=rupture`);
+  }
 
   revalidatePath(`/gadgets/${gadgetId}`);
   revalidatePath("/dashboard/contributeur");
+  redirect(`/gadgets/${gadgetId}`);
 }

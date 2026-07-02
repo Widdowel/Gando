@@ -33,6 +33,7 @@ export default async function AdminCagnottesPage() {
               <th className="py-2 font-medium">Cotisation/mois</th>
               <th className="py-2 font-medium">Participants</th>
               <th className="py-2 font-medium">Statut</th>
+              <th className="py-2 font-medium"></th>
             </tr>
           </thead>
           <tbody>
@@ -67,6 +68,14 @@ export default async function AdminCagnottesPage() {
                     </button>
                     <Badge statut={cagnotte.statut} />
                   </form>
+                </td>
+                <td className="py-2">
+                  <a
+                    href={`/admin/cagnottes/${cagnotte.id}`}
+                    className="text-xs font-medium text-amber-800 hover:underline"
+                  >
+                    Attributions →
+                  </a>
                 </td>
               </tr>
             ))}

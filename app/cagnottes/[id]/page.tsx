@@ -7,8 +7,15 @@ import Badge from "@/components/ui/Badge";
 import { formatMontant, deviseParPays } from "@/lib/utils/currency";
 import { rejoindreCagnotte } from "./actions";
 
-export default async function CagnottePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function CagnottePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
+}) {
   const { id } = await params;
+  const { error } = await searchParams;
 
   const cagnotte = await prisma.cagnotte.findUnique({
     where: { id },
@@ -37,6 +44,13 @@ export default async function CagnottePage({ params }: { params: Promise<{ id: s
       <p className="text-neutral-500">
         {cagnotte.residence.pays.nom} · {cagnotte.residence.type.nom}
       </p>
+
+      {error === "complete" && (
+        <p className="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+          Cette cagnotte n&apos;accepte plus de nouveaux participants — elle vient d&apos;être
+          complétée ou fermée.
+        </p>
+      )}
 
       <div className="mt-8">
         <MatterportViewer url={cagnotte.residence.type.matterportUrl} titre={cagnotte.residence.nom} />

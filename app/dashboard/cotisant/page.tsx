@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Badge from "@/components/ui/Badge";
 import { formatMontant, deviseParPays } from "@/lib/utils/currency";
+import { payerCotisation } from "./actions";
 
 export default async function DashboardCotisantPage() {
   const session = await auth();
@@ -96,6 +97,54 @@ export default async function DashboardCotisantPage() {
                   />
                 </div>
               </div>
+
+              {cotisation.statut !== "complete" && (
+                <div className="mt-6 rounded-md border border-neutral-100 bg-neutral-50 p-4">
+                  <p className="mb-2 text-xs font-medium text-neutral-500">Effectuer un versement</p>
+                  <form
+                    action={payerCotisation.bind(null, cotisation.id)}
+                    className="flex flex-wrap items-end gap-3"
+                  >
+                    <div>
+                      <label className="block text-xs text-neutral-500">Montant</label>
+                      <input
+                        type="number"
+                        name="montant"
+                        min={1}
+                        defaultValue={cotisation.cagnotte.cotisationMensuelle}
+                        required
+                        className="w-32 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-neutral-500">Méthode</label>
+                      <select
+                        name="methodePaiement"
+                        required
+                        className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+                      >
+                        <option value="mobile_money">Mobile Money</option>
+                        <option value="virement">Virement</option>
+                        <option value="carte">Carte</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-neutral-500">Référence (optionnel)</label>
+                      <input
+                        type="text"
+                        name="reference"
+                        className="w-40 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="rounded-md bg-amber-800 px-4 py-1.5 text-sm font-medium text-white hover:bg-amber-900"
+                    >
+                      Payer
+                    </button>
+                  </form>
+                </div>
+              )}
 
               <div className="mt-6">
                 <p className="text-xs text-neutral-500">Revenus locatifs perçus ce mois</p>

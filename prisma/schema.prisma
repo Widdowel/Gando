@@ -125,6 +125,7 @@ model Cotisation {
   statut        String   @default("actif") // actif | suspendu | defaillant | complete
   paiements     PaiementCotisation[]
   redistribution RedistributionMutuelle[]
+  attribution   Attribution?
   createdAt     DateTime @default(now())
 }
 
@@ -181,6 +182,7 @@ model Attribution {
   cagnotteId    String
   cagnotte      Cagnotte @relation(fields: [cagnotteId], references: [id])
   cotisationId  String   @unique
+  cotisation    Cotisation @relation(fields: [cotisationId], references: [id])
   dateAttribution DateTime @default(now())
   statut        String   @default("en_attente")
   // en_attente | parcelle_remboursee | titre_delivre

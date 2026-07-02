@@ -6,8 +6,15 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import { formatFCFA } from "@/lib/utils/currency";
 import { acheterGadget } from "./actions";
 
-export default async function GadgetPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function GadgetPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
+}) {
   const { id } = await params;
+  const { error } = await searchParams;
 
   const gadget = await prisma.gadget.findUnique({
     where: { id },
@@ -25,6 +32,13 @@ export default async function GadgetPage({ params }: { params: Promise<{ id: str
       <p className="text-neutral-500">
         {gadget.residence.nom} · {gadget.residence.pays.nom}
       </p>
+
+      {error === "rupture" && (
+        <p className="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+          Ce gadget vient d&apos;être épuisé — quelqu&apos;un d&apos;autre a acheté la dernière
+          unité juste avant vous.
+        </p>
+      )}
 
       <div className="mt-8">
         <MatterportViewer url={gadget.residence.type.matterportUrl} titre={gadget.residence.nom} />
